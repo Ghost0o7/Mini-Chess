@@ -27,6 +27,9 @@ int whitePawnsAtEnd = 0;
 int blackPawnsAtEnd = 0;
 int blackPawnsRemaining = 3;
 
+int whiteBack=3;
+int blackBack=3;
+
 
 bool pawnsSpawned = false; // Flag to track whether the pawns have already been spawned
 bool gameOver=false;	 // Flag to track whether the game has finished yet
@@ -55,7 +58,7 @@ void reshape(int width, int height) {
 void movePawn(int x, int y) {
 
 
-	
+
 	// Check if it is white's turn
 	if (whiteTurn) {
 		// Check if the selected pawn is a valid white pawn
@@ -128,6 +131,19 @@ void movePawn(int x, int y) {
 		previousBlackPawnPositions[selectedPawn - 3][1] = blackPawnPositions[selectedPawn - 3][1];
 		blackPawnPositions[selectedPawn - 3][0] = x;
 		blackPawnPositions[selectedPawn - 3][1] = y;
+
+		// Check if all white pawns have reached the end of the board
+
+		for (int i = 0; i < 3; i++) {
+			if (blackPawnPositions[i][1] == 0) {
+				blackPawnsAtEnd++;
+			}
+		}
+		if (blackPawnsAtEnd == 1) {
+			// printf("Game over! White wins!\n");
+			gameOver = true;
+			return;
+		}
 
 		// Change the turn to white
 		whiteTurn = true;
@@ -249,15 +265,21 @@ void keyboard(unsigned char key, int x, int y) {
 			 }
 			 break;
 	case 'z':
+		if(whiteBack!=0){
 		if (selectedPawn >= 0 && selectedPawn < 3) {
 			// Move the selected white pawn back to its previous position
 			whitePawnPositions[selectedPawn][0] = previousWhitePawnPositions[selectedPawn][0];
 			whitePawnPositions[selectedPawn][1] = previousWhitePawnPositions[selectedPawn][1];
+			whiteBack--;
 		}
-		else if (selectedPawn >= 3 && selectedPawn < 6) {
+		}
+		if(blackBack!=0){
+		 if (selectedPawn >= 3 && selectedPawn < 6) {
 			// Move the selected black pawn back to its previous position
 			blackPawnPositions[selectedPawn - 3][0] = previousBlackPawnPositions[selectedPawn - 3][0];
 			blackPawnPositions[selectedPawn - 3][1] = previousBlackPawnPositions[selectedPawn - 3][1];
+			blackBack--;
+		}
 		}
 		whiteTurn = !whiteTurn;
 		break;
@@ -287,16 +309,18 @@ void keyboard(unsigned char key, int x, int y) {
 		selectedPawn = -1;
 		break;
 	case 'r':
-	
-        // Reset the game
-        pawnsSpawned = false;
-        gameOver = false;
-        whiteTurn = true;
-        selectedPawn = -1;
-        whitePawnsRemaining = 3;
-        blackPawnsRemaining = 3;
-        whitePawnsAtEnd = 0;
-        blackPawnsAtEnd = 0;
+
+		// Reset the game
+		pawnsSpawned = false;
+		gameOver = false;
+		whiteTurn = true;
+		selectedPawn = -1;
+		whitePawnsRemaining = 3;
+		blackPawnsRemaining = 3;
+		whitePawnsAtEnd = 0;
+		blackPawnsAtEnd = 0;
+		whiteBack=3;
+		blackBack=3;
 		break;
 
 	}
@@ -411,9 +435,9 @@ void display() {
 		// Set the message based on the conditions
 		char* message;
 		if (whitePawnsAtEnd==1) {
-			message = "Game over! White wins!";
+			message = "Game over! Green wins!";
 		}else if (blackPawnsAtEnd==1) {
-			message = "Game over! Black wins!";
+			message = "Game over! Blue wins!";
 		}
 
 		// Draw the message one character at a time
@@ -428,8 +452,8 @@ void display() {
 		// Set the position of the text
 		glRasterPos2i(-10, 38);
 		// Draw the text
-		for (int i = 0; i < strlen("White's turn"); i++) {
-			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, "White's turn"[i]);
+		for (int i = 0; i < strlen("Green's turn"); i++) {
+			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, "Green's turn"[i]);
 		}
 	}
 	else {
@@ -438,9 +462,21 @@ void display() {
 		// Set the position of the text
 		glRasterPos2i(-10, 38);
 		// Draw the text
-		for (int i = 0; i < strlen("Black's turn"); i++) {
-			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, "Black's turn"[i]);
+		for (int i = 0; i < strlen("Blue's turn"); i++) {
+			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, "Blue's turn"[i]);
 		}
+	}
+	glRasterPos2i(-10, 35);
+	char buffer[100];
+	sprintf(buffer, "Green's Backs: %d", whiteBack);
+	for (int i = 0; i < strlen(buffer); i++) {
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, buffer[i]);
+	}
+	glRasterPos2i(-10, 34);
+	char buffer1[100];
+	sprintf(buffer1, "Blue's Backs: %d", blackBack);
+	for (int i = 0; i < strlen(buffer1); i++) {
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, buffer1[i]);
 	}
 	glRasterPos2i(-10, 16);
 	// Draw the text
@@ -488,7 +524,7 @@ void display() {
 	for (int i = 0; i < strlen("Note:if u select the pawn and didnt move"); i++) {
 		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, "Note:if u select the pawn and didnt move"[i]);
 	}
-	
+
 	glRasterPos2i(-10, 4);
 	for (int i = 0; i < strlen("               better to diselect it"); i++) {
 		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, "           better to diselect it"[i]);
@@ -528,7 +564,7 @@ int main(int argc, char** argv) {
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 
 	// Set the window size and position						
-	glutInitWindowSize(800, 800);
+	glutInitWindowSize(640, 640);
 	// glutInitWindowPosition(100, 100);
 
 
